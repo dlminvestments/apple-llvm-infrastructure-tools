@@ -6,4 +6,4 @@ gitdb2==4.0.1
 lit
 flake8==3.8.4
 mypy
-httpretty
+httpretty==1.0.2
