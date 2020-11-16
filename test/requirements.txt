@@ -2,7 +2,7 @@ pytest-mock
 pytest-xdist
 pytest
 GitPython==2.1.11
-gitdb2==2.0.6
+gitdb2==4.0.1
 lit
 flake8
 mypy
