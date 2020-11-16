@@ -1,4 +1,4 @@
-pytest-mock
+pytest-mock==3.3.1
 pytest-xdist
 pytest
 GitPython==2.1.11
