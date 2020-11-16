@@ -3,7 +3,7 @@ pytest-xdist
 pytest
 GitPython==2.1.11
 gitdb2==2.0.6
-lit
+lit==0.11.0.post1
 flake8
 mypy
 httpretty
