@@ -1,5 +1,5 @@
 pytest-mock
-pytest-xdist
+pytest-xdist==2.1.0
 pytest
 GitPython==2.1.11
 gitdb2==2.0.6
