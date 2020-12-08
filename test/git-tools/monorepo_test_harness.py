@@ -130,18 +130,21 @@ def create_monorepo(commits: List[CommitBlueprint]):
         hs = commit.split_commit_hash
         trailers = f'\n---\napple-llvm-split-commit: {hs}\napple-llvm-split-dir: {commit.split_dir}/'
         if isinstance(commit, BlobCommitBlueprint) and commit.is_internal:
-            assert commit.parent and commit.parent.monorepo_commit_hash is not None
+            if not (commit.parent and commit.parent.monorepo_commit_hash is not None):
+                raise AssertionError
             if is_first:
                 git('checkout', '-b', 'internal/master', commit.parent.monorepo_commit_hash)
                 git('clean', '-d', '-f')
                 is_first = False
             commit.monorepo_commit_hash = commit_file(commit.monorepo_filename, commit.text, trailers=trailers)
         elif isinstance(commit, MergeCommitBlueprint):
-            assert not is_first
+            if is_first:
+                raise AssertionError
             # Verify the the expected split merge is already there.
             git('merge-base', '--is-ancestor', commit.downstream.monorepo_commit_hash, 'internal/master')
             # Recreate the merge.
-            assert commit.upstream.monorepo_commit_hash is not None
+            if commit.upstream.monorepo_commit_hash is None:
+                raise AssertionError
             git('merge', '--no-commit', commit.upstream.monorepo_commit_hash)
             msg = f'Merge {commit.upstream.monorepo_commit_hash} into internal/master\n{trailers}'
             git('commit', '-m', msg)

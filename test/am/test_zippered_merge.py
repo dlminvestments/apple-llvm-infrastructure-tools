@@ -14,57 +14,75 @@ def br(commits, merge_bases, initial_merge_base) -> BranchIterator:
 
 
 def test_zippered_merge_alg_no_zipper():
-    assert compute_zippered_merge_commits(br([], [], 'm/A'),
-                                          br([], [], 'm/A')) == []
+    if compute_zippered_merge_commits(br([], [], 'm/A'),
+                                          br([], [], 'm/A')) != []:
+        raise AssertionError
 
     # Allow direct merges when merge bases match.
-    assert compute_zippered_merge_commits(br(['l/A'], ['m/A'], 'm/A'),
-                                          br([], [], 'm/A')) == [['l/A']]
+    if compute_zippered_merge_commits(br(['l/A'], ['m/A'], 'm/A'),
+                                          br([], [], 'm/A')) != [['l/A']]:
+        raise AssertionError
 
-    assert compute_zippered_merge_commits(br([], [], 'm/A'),
-                                          br(['r/A'], ['m/A'], 'm/A')) == [['r/A']]
+    if compute_zippered_merge_commits(br([], [], 'm/A'),
+                                          br(['r/A'], ['m/A'], 'm/A')) != [['r/A']]:
+        raise AssertionError
 
-    assert compute_zippered_merge_commits(br(['l/A'], ['m/A'], 'm/A'),
-                                          br(['r/A'], ['m/A'], 'm/A')) == [['l/A'], ['r/A']]
+    if compute_zippered_merge_commits(br(['l/A'], ['m/A'], 'm/A'),
+                                          br(['r/A'], ['m/A'], 'm/A')) != [['l/A'], ['r/A']]:
+        raise AssertionError
 
     # Mismatching merge bases don't allow direct merges.
-    assert compute_zippered_merge_commits(br(['l/A'], ['m/A'], 'm/A'),
-                                          br([], [], 'm/B')) == []
+    if compute_zippered_merge_commits(br(['l/A'], ['m/A'], 'm/A'),
+                                          br([], [], 'm/B')) != []:
+        raise AssertionError
 
-    assert compute_zippered_merge_commits(br([], [], 'm/B'),
-                                          br(['r/A'], ['m/A'], 'm/A')) == []
+    if compute_zippered_merge_commits(br([], [], 'm/B'),
+                                          br(['r/A'], ['m/A'], 'm/A')) != []:
+        raise AssertionError
 
-    assert compute_zippered_merge_commits(br(['l/A', 'l/B'], ['m/A', 'm/B'], 'm/A'),
-                                          br(['r/A'], ['m/A'], 'm/A')) == [['l/A'], ['r/A']]
+    if compute_zippered_merge_commits(br(['l/A', 'l/B'], ['m/A', 'm/B'], 'm/A'),
+                                          br(['r/A'], ['m/A'], 'm/A')) != [['l/A'], ['r/A']]:
+        raise AssertionError
 
-    assert compute_zippered_merge_commits(br(['l/A'], ['m/A'], 'm/A'),
-                                          br(['r/A', 'r/B'], ['m/A', 'm/B'], 'm/A')) == [['l/A'], ['r/A']]
+    if compute_zippered_merge_commits(br(['l/A'], ['m/A'], 'm/A'),
+                                          br(['r/A', 'r/B'], ['m/A', 'm/B'], 'm/A')) != [['l/A'], ['r/A']]:
+        raise AssertionError
 
 
 def test_zippered_merge_alg():
-    assert compute_zippered_merge_commits(br(['l/A'], ['m/B'], 'm/A'),
-                                          br(['r/A'], ['m/B'], 'm/A')) == [['l/A', 'r/A']]
-    assert compute_zippered_merge_commits(br(['l/A', 'l/B'], ['m/A', 'm/B'], 'm/A'),
-                                          br(['r/A'], ['m/B'], 'm/B')) == [['l/B', 'r/A']]
-    assert compute_zippered_merge_commits(br(['l/A'], ['m/B'], 'm/B'),
-                                          br(['r/A', 'r/B'], ['m/A', 'm/B'], 'm/A')) == [['l/A', 'r/B']]
+    if compute_zippered_merge_commits(br(['l/A'], ['m/B'], 'm/A'),
+                                          br(['r/A'], ['m/B'], 'm/A')) != [['l/A', 'r/A']]:
+        raise AssertionError
+    if compute_zippered_merge_commits(br(['l/A', 'l/B'], ['m/A', 'm/B'], 'm/A'),
+                                          br(['r/A'], ['m/B'], 'm/B')) != [['l/B', 'r/A']]:
+        raise AssertionError
+    if compute_zippered_merge_commits(br(['l/A'], ['m/B'], 'm/B'),
+                                          br(['r/A', 'r/B'], ['m/A', 'm/B'], 'm/A')) != [['l/A', 'r/B']]:
+        raise AssertionError
 
-    assert compute_zippered_merge_commits(br(['l/A', 'l/B'], ['m/B', 'm/C'], 'm/A'),
-                                          br(['r/A', 'r/B'], ['m/B', 'm/C'], 'm/A')) == [['l/A', 'r/A'], ['l/B', 'r/B']]
-    assert compute_zippered_merge_commits(br(['l/A', 'l/B'], ['m/B1', 'm/C'], 'm/A'),
-                                          br(['r/A', 'r/B'], ['m/B2', 'm/C'], 'm/A')) == [['l/B', 'r/B']]
+    if compute_zippered_merge_commits(br(['l/A', 'l/B'], ['m/B', 'm/C'], 'm/A'),
+                                          br(['r/A', 'r/B'], ['m/B', 'm/C'], 'm/A')) != [['l/A', 'r/A'], ['l/B', 'r/B']]:
+        raise AssertionError
+    if compute_zippered_merge_commits(br(['l/A', 'l/B'], ['m/B1', 'm/C'], 'm/A'),
+                                          br(['r/A', 'r/B'], ['m/B2', 'm/C'], 'm/A')) != [['l/B', 'r/B']]:
+        raise AssertionError
 
     # Zippered + direct.
-    assert compute_zippered_merge_commits(br(['l/A', 'l/B'], ['m/B', 'm/B'], 'm/A'),
-                                          br(['r/A', 'r/B'], ['m/B', 'm/B'], 'm/A')) == [['l/A', 'r/A'],
-                                                                                         ['l/B'], ['r/B']]
-    assert compute_zippered_merge_commits(br(['l/A', 'l/B'], ['m/B', 'm/B'], 'm/A'),
-                                          br(['r/A', 'r/B'], ['m/B', 'm/C'], 'm/A')) == [['l/A', 'r/A'], ['l/B']]
-    assert compute_zippered_merge_commits(br(['l/A', 'l/B'], ['m/B', 'm/C'], 'm/A'),
-                                          br(['r/A', 'r/B'], ['m/B', 'm/B'], 'm/A')) == [['l/A', 'r/A'], ['r/B']]
+    if compute_zippered_merge_commits(br(['l/A', 'l/B'], ['m/B', 'm/B'], 'm/A'),
+                                          br(['r/A', 'r/B'], ['m/B', 'm/B'], 'm/A')) != [['l/A', 'r/A'],
+                                                                                         ['l/B'], ['r/B']]:
+        raise AssertionError
+    if compute_zippered_merge_commits(br(['l/A', 'l/B'], ['m/B', 'm/B'], 'm/A'),
+                                          br(['r/A', 'r/B'], ['m/B', 'm/C'], 'm/A')) != [['l/A', 'r/A'], ['l/B']]:
+        raise AssertionError
+    if compute_zippered_merge_commits(br(['l/A', 'l/B'], ['m/B', 'm/C'], 'm/A'),
+                                          br(['r/A', 'r/B'], ['m/B', 'm/B'], 'm/A')) != [['l/A', 'r/A'], ['r/B']]:
+        raise AssertionError
 
     # Direct + zippered.
-    assert compute_zippered_merge_commits(br(['l/A', 'l/B'], ['m/A', 'm/B'], 'm/A'),
-                                          br(['r/B'], ['m/B'], 'm/A')) == [['l/A'], ['l/B', 'r/B']]
-    assert compute_zippered_merge_commits(br(['l/B'], ['m/B'], 'm/A'),
-                                          br(['r/A', 'r/B'], ['m/A', 'm/B'], 'm/A')) == [['r/A'], ['l/B', 'r/B']]
+    if compute_zippered_merge_commits(br(['l/A', 'l/B'], ['m/A', 'm/B'], 'm/A'),
+                                          br(['r/B'], ['m/B'], 'm/A')) != [['l/A'], ['l/B', 'r/B']]:
+        raise AssertionError
+    if compute_zippered_merge_commits(br(['l/B'], ['m/B'], 'm/A'),
+                                          br(['r/A', 'r/B'], ['m/A', 'm/B'], 'm/A')) != [['r/A'], ['l/B', 'r/B']]:
+        raise AssertionError

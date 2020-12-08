@@ -59,33 +59,49 @@ def cd_to_am_tool_repo_clone(am_tool_git_repo_clone: str):
 
 def test_am_config(cd_to_am_tool_repo_clone):
     configs = find_am_configs()
-    assert len(configs) == 2
-    assert configs[0].upstream == 'upstream'
-    assert configs[0].target == 'master'
-    assert configs[0].test_command is None
-    assert configs[0].secondary_upstream is None
-    assert configs[0].common_ancestor is None
-    assert configs[0].test_commits_in_bundle is False
+    if len(configs) != 2:
+        raise AssertionError
+    if configs[0].upstream != 'upstream':
+        raise AssertionError
+    if configs[0].target != 'master':
+        raise AssertionError
+    if configs[0].test_command is not None:
+        raise AssertionError
+    if configs[0].secondary_upstream is not None:
+        raise AssertionError
+    if configs[0].common_ancestor is not None:
+        raise AssertionError
+    if configs[0].test_commits_in_bundle is not False:
+        raise AssertionError
 
-    assert configs[1].upstream == 'master'
-    assert configs[1].target == 'swift/master'
-    assert configs[1].test_command is None
-    assert configs[1].secondary_upstream is None
-    assert configs[1].common_ancestor is None
-    assert configs[1].test_commits_in_bundle is True
+    if configs[1].upstream != 'master':
+        raise AssertionError
+    if configs[1].target != 'swift/master':
+        raise AssertionError
+    if configs[1].test_command is not None:
+        raise AssertionError
+    if configs[1].secondary_upstream is not None:
+        raise AssertionError
+    if configs[1].common_ancestor is not None:
+        raise AssertionError
+    if configs[1].test_commits_in_bundle is not True:
+        raise AssertionError
 
 
 def test_am_print_status(cd_to_am_tool_repo_clone, capfd):
     print_status()
     captured = capfd.readouterr()
-    assert '[upstream -> master]\n- 0 unmerged commits. master is up to date.\n' in captured.out
+    if '[upstream -> master]\n- 0 unmerged commits. master is up to date.\n' not in captured.out:
+        raise AssertionError
 
 
 def test_am_status(cd_to_am_tool_repo_clone):
     result = CliRunner().invoke(am, ['status', '--target', 'master', '--no-fetch'])
 
-    assert result.exit_code == 0
-    assert result.output == '[upstream -> master]\n- 0 unmerged commits. master is up to date.\n'
+    if result.exit_code != 0:
+        raise AssertionError
+    if result.output != '[upstream -> master]\n- 0 unmerged commits. master is up to date.\n':
+        raise AssertionError
 
 
 # FIXME: more tests.

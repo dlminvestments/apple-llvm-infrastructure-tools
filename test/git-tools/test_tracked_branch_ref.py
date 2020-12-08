@@ -17,11 +17,16 @@ def optional_remote_prefix(request) -> str:
 
 def test_get_tracked_branch_ref(cd_to_monorepo_clone, monorepo_test_fixture, optional_remote_prefix: str):
     ref: Optional[TrackedBranchRef] = get_tracked_branch_ref(optional_remote_prefix + 'internal/master')
-    assert ref is not None
-    assert ref.remote_name == 'origin'
-    assert ref.remote_url == monorepo_test_fixture.path
-    assert ref.branch_name == 'internal/master'
-    assert ref.head_hash is not None
+    if ref is None:
+        raise AssertionError
+    if ref.remote_name != 'origin':
+        raise AssertionError
+    if ref.remote_url != monorepo_test_fixture.path:
+        raise AssertionError
+    if ref.branch_name != 'internal/master':
+        raise AssertionError
+    if ref.head_hash is None:
+        raise AssertionError
 
 
 def test_different_tracked_branch_ref(cd_to_monorepo_clone, monorepo_test_fixture, optional_remote_prefix: str):
@@ -32,14 +37,20 @@ def test_different_tracked_branch_ref(cd_to_monorepo_clone, monorepo_test_fixtur
     ref: Optional[TrackedBranchRef] = get_tracked_branch_ref(optional_remote_prefix + branch_name)
     if len(optional_remote_prefix) > 0:
         # The ref doesn't exist on the remote
-        assert ref is None
+        if ref is not None:
+            raise AssertionError
         return
-    assert ref is not None
-    assert ref.remote_name == 'origin'
-    assert ref.remote_url == monorepo_test_fixture.path
-    assert ref.branch_name == 'internal/master'
+    if ref is None:
+        raise AssertionError
+    if ref.remote_name != 'origin':
+        raise AssertionError
+    if ref.remote_url != monorepo_test_fixture.path:
+        raise AssertionError
+    if ref.branch_name != 'internal/master':
+        raise AssertionError
 
 
 def test_get_no_tracked_branch_ref(cd_to_monorepo_clone, optional_remote_prefix: str):
     ref: Optional[TrackedBranchRef] = get_tracked_branch_ref(optional_remote_prefix + 'foo')
-    assert ref is None
+    if ref is not None:
+        raise AssertionError

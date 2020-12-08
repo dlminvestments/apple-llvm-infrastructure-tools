@@ -18,7 +18,8 @@ def verify_swift_branch(branch_name: str):
     1: A swift branch should have apple-llvm-config/am/<branch-name>.json
     2: The primary upstream branch of the swift/ branch should have identical contents, except for LLDB.
     """
-    assert branch_name.startswith('swift/')
+    if not branch_name.startswith('swift/'):
+        raise AssertionError
     # FIXME: To implement.
 
 

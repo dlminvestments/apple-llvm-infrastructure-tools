@@ -117,9 +117,10 @@ def test_pr_tool_list(config_dir: str, cd_to_pr_tool_repo, capfd):
     tp = test_plans.TestPlanDispatcher()
     tp.dispatch_test_plan_for_pull_request('check-llvm', 9)
     out, err = capfd.readouterr()
-    assert out == """✅ requested check-llvm [a-RA] ci job for PR #9
+    if out != """✅ requested check-llvm [a-RA] ci job for PR #9
 ✅ requested check-llvm [b-RA] ci job for PR #9
-"""
+""":
+        raise AssertionError
 
     def request_callback_err(request, uri, response_headers):
         return [402, response_headers, 'problem on server']
@@ -132,5 +133,7 @@ def test_pr_tool_list(config_dir: str, cd_to_pr_tool_repo, capfd):
                            match_querystring=True)
     with pytest.raises(jenkins.CIDispatchError) as err:
         tp.dispatch_test_plan_for_pull_request('check-llvm', 1)
-    assert err.value.status_code == 402
-    assert err.value.error == 'problem on server'
+    if err.value.status_code != 402:
+        raise AssertionError
+    if err.value.error != 'problem on server':
+        raise AssertionError

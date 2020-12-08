@@ -58,5 +58,7 @@ def test_am_status_ci_state(mocker, cd_to_am_tool_repo_clone):
 
     result = CliRunner().invoke(am, ['status', '--target', 'master', '--no-fetch', '--ci-status'])
 
-    assert result.exit_code == 0
-    assert ': PASSED' in result.output
+    if result.exit_code != 0:
+        raise AssertionError
+    if ': PASSED' not in result.output:
+        raise AssertionError

@@ -87,10 +87,12 @@ def find_inflight_merges(remote: str = 'origin') -> Dict[str, List[str]]:
     for ref in refs:
         if not ref:
             continue
-        assert ref.startswith(AM_STATUS_PREFIX)
+        if not ref.startswith(AM_STATUS_PREFIX):
+            raise AssertionError
         merge_name = ref[len(AM_STATUS_PREFIX):]
         underscore_idx = merge_name.find('_')
-        assert underscore_idx != -1
+        if underscore_idx == -1:
+            raise AssertionError
         commit_hash = merge_name[:underscore_idx]
         dest_branch = merge_name[underscore_idx + 1:]
 

@@ -31,7 +31,8 @@ def test_fast_forward_commit_graph(split_clang_head_in_monorepo: str, merge_stra
                                                    'clang',
                                                    'split/clang/internal/master',
                                                    merge_strategy)
-    assert work_head == commit
+    if work_head != commit:
+        raise AssertionError
 
 
 def test_rebase_commit_graph(split_clang_head_in_monorepo: str,
@@ -50,14 +51,18 @@ def test_rebase_commit_graph(split_clang_head_in_monorepo: str,
     if merge_strategy == MergeStrategy.FastForwardOnly:
         with pytest.raises(ImpossibleMergeError) as err:
             doit()
-        assert 'Not possible to fast-forward' in err.value.git_error.stderr
+        if 'Not possible to fast-forward' not in err.value.git_error.stderr:
+            raise AssertionError
     else:
         # However, other strategies rebase the commit graph on top of the
         # destination branch.
         commit = doit()
-        assert work_head != commit
-        assert new_clang_head != commit
-        assert new_clang_head == git_output('rev-parse', f'{commit}~1')
+        if work_head == commit:
+            raise AssertionError
+        if new_clang_head == commit:
+            raise AssertionError
+        if new_clang_head != git_output('rev-parse', f'{commit}~1'):
+            raise AssertionError
 
 
 def test_merge_commit_graph(split_clang_head_in_monorepo: str,
@@ -91,12 +96,16 @@ def test_merge_commit_graph(split_clang_head_in_monorepo: str,
     # Graph with merges can only be merged.
     if merge_strategy == MergeStrategy.RebaseOrMerge:
         commit = doit()
-        assert merge_commit != commit
+        if merge_commit == commit:
+            raise AssertionError
 
         parents = git_output('show', '--format=%P', commit).split()
-        assert 2 == len(parents)
-        assert new_clang_head == parents[0]
-        assert merge_commit == parents[1]
+        if 2 != len(parents):
+            raise AssertionError
+        if new_clang_head != parents[0]:
+            raise AssertionError
+        if merge_commit != parents[1]:
+            raise AssertionError
     else:
         with pytest.raises(ImpossibleMergeError):
             doit()
@@ -116,6 +125,8 @@ def test_merge_conflict(split_clang_head_in_monorepo: str,
                                               branch_name,
                                               merge_strategy)
     if merge_strategy == MergeStrategy.Rebase:
-        assert err.value.operation == 'rebase'
+        if err.value.operation != 'rebase':
+            raise AssertionError
     elif merge_strategy == MergeStrategy.RebaseOrMerge:
-        assert err.value.operation == 'merge'
+        if err.value.operation != 'merge':
+            raise AssertionError

@@ -82,32 +82,38 @@ def cd_to_am_tool_repo_clone(am_tool_git_repo_clone: str):
 def test_am_secondary_edge_status(cd_to_am_tool_repo_clone):
     result = CliRunner().invoke(am, ['status', '--target', 'downstream/swift/master', '--no-fetch'])
 
-    assert result.exit_code == 0
-    assert """[downstream/master -> downstream/swift/master <- swift/master]
+    if result.exit_code != 0:
+        raise AssertionError
+    if """[downstream/master -> downstream/swift/master <- swift/master]
 - This is a zippered merge branch!
 - 1 unmerged commits from downstream/master.
 - 2 unmerged commits from swift/master.
-- The automerger has found a common merge-base.""" in result.output
+- The automerger has found a common merge-base.""" not in result.output:
+        raise AssertionError
 
 
 def test_am_secondary_edge_status_merged(cd_to_am_tool_repo_clone):
     result = CliRunner().invoke(am, ['status', '--target', 'downstream/swift/master-merged', '--no-fetch'])
 
-    assert result.exit_code == 0
-    assert """[downstream/master -> downstream/swift/master-merged <- swift/master]
+    if result.exit_code != 0:
+        raise AssertionError
+    if """[downstream/master -> downstream/swift/master-merged <- swift/master]
 - This is a zippered merge branch!
-- 0 unmerged commits. downstream/swift/master-merged is up to date.""" in result.output
+- 0 unmerged commits. downstream/swift/master-merged is up to date.""" not in result.output:
+        raise AssertionError
 
 
 def test_am_secondary_edge_status_blocked(cd_to_am_tool_repo_clone):
     result = CliRunner().invoke(am, ['status', '--target', 'downstream/swift/master-unmergeable', '--no-fetch'])
 
     print(result.output)
-    assert result.exit_code == 0
-    assert """[downstream/master -> downstream/swift/master-unmergeable <- swift/master2]
+    if result.exit_code != 0:
+        raise AssertionError
+    if """[downstream/master -> downstream/swift/master-unmergeable <- swift/master2]
 - This is a zippered merge branch!
 - 0 unmerged commits from downstream/master.
 - 1 unmerged commits from swift/master2.
 - The automerger is waiting for unmerged commits to share
   a merge-base from master
-  before merging (i.e., one of the upstreams is behind).""" in result.output
+  before merging (i.e., one of the upstreams is behind).""" not in result.output:
+        raise AssertionError

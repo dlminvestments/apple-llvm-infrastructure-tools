@@ -24,7 +24,8 @@ def get_tracked_branch_ref(branch_name: str) -> Optional[TrackedBranchRef]:
             tracking_branch_name = branch_name
         else:
             return None
-    assert '/' in tracking_branch_name
+    if '/' not in tracking_branch_name:
+        raise AssertionError
     rb = tracking_branch_name.split('/', 1)
     remote_branch = rb[1]
     output: Optional[str] = git_output(
