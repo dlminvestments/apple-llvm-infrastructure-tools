@@ -1,9 +1,6 @@
-pytest-mock
+pytest-mock==3.3.1
 pytest-xdist
-pytest
-GitPython==3.1.11
-gitdb2==2.0.6
 lit
-flake8
+flake8==3.8.4
 mypy
-httpretty
+httpretty==1.0.3
