@@ -4,6 +4,3 @@ pytest==6.1.2
 GitPython==3.1.11
 gitdb2==4.0.2
 lit
-flake8==3.8.4
-mypy
-httpretty==1.0.3
