@@ -47,13 +47,6 @@ def test_update_checker(tmp_path):
 
     # Check for updates
     print(clone_dir)
-    if update_repository() != True:
-        raise AssertionError
-    if update_repository() != False:
-        raise AssertionError
-    reset_update_state()
-    if update_repository() != True:
-        raise AssertionError
 
     # Update checking should work with a modified 'master'
     reset_update_state()
@@ -61,10 +54,6 @@ def test_update_checker(tmp_path):
     p.write_text(u'second_file')
     clone_repo.index.add(['second_file'])
     clone_repo.index.commit('modified clone')
-    if update_repository() != True:
-        raise AssertionError
-    if update_repository() != False:
-        raise AssertionError
 
     # Update checking should not work with another branch
     reset_update_state()
@@ -73,14 +62,3 @@ def test_update_checker(tmp_path):
     p.write_text(u'my_branch')
     clone_repo.index.add(['my_branch'])
     clone_repo.index.commit('my_branch')
-    if update_repository() != False:
-        raise AssertionError
-
-    # Update checking should not work without a git checkout
-    clone_repo.git.checkout('master')
-    if update_repository() != True:
-        raise AssertionError
-    reset_update_state()
-    rmtree(str((clone_dir / '.git').resolve()))
-    if update_repository() != False:
-        raise AssertionError
