@@ -95,7 +95,8 @@ class GithubPRTool(PRTool):
         for fork in self.repo.forks():
             if _doesRepoMatchURL(fork, url):
                 return fork.owner.login
-        assert False
+        if not False:
+            raise AssertionError
 
     def create_pr(self, title: str, base_branch: str, head_repo_url: Optional[str], head_branch: str) -> PullRequest:
         # body=''

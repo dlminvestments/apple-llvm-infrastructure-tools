@@ -85,13 +85,20 @@ def test_pr_tool_list(pr_tool_type):
     tool = create_pr_tool(mock_tool, pr_tool_type)
     prs = tool.list()
 
-    assert len(prs) == 1
-    assert prs[0].number == 1
-    assert prs[0].state == PullRequestState.Open
-    assert prs[0].title == 'My test'
-    assert prs[0].body_text == 'This tests important things'
-    assert prs[0].author_username == '<author>'
-    assert prs[0].base_branch == 'master'
+    if len(prs) != 1:
+        raise AssertionError
+    if prs[0].number != 1:
+        raise AssertionError
+    if prs[0].state != PullRequestState.Open:
+        raise AssertionError
+    if prs[0].title != 'My test':
+        raise AssertionError
+    if prs[0].body_text != 'This tests important things':
+        raise AssertionError
+    if prs[0].author_username != '<author>':
+        raise AssertionError
+    if prs[0].base_branch != 'master':
+        raise AssertionError
 
 
 def test_cli_list(pr_tool_type, cd_to_pr_tool_repo):
@@ -101,13 +108,15 @@ def test_cli_list(pr_tool_type, cd_to_pr_tool_repo):
 
     result = CliRunner().invoke(pr, ['list'])
 
-    assert result.exit_code == 0
-    assert result.output == '''- [#1] My test
+    if result.exit_code != 0:
+        raise AssertionError
+    if result.output != '''- [#1] My test
   test/pr/1
 
   This tests important things
 
-'''
+''':
+        raise AssertionError
 
 
 def test_list_target(pr_tool_type, cd_to_pr_tool_repo):
@@ -117,24 +126,30 @@ def test_list_target(pr_tool_type, cd_to_pr_tool_repo):
     git_apple_llvm.pr.main.pr_tool = create_pr_tool(mock_tool, pr_tool_type)
 
     result = CliRunner().invoke(pr, ['list', '--target', 'master'])
-    assert result.exit_code == 0
-    assert result.output == '''- [#1] My test
+    if result.exit_code != 0:
+        raise AssertionError
+    if result.output != '''- [#1] My test
   test/pr/1
 
   This tests important things
 
-'''
+''':
+        raise AssertionError
     result = CliRunner().invoke(pr, ['list', '--target', 'stable'])
-    assert result.exit_code == 0
-    assert result.output == '''- [#2] Another 2
+    if result.exit_code != 0:
+        raise AssertionError
+    if result.output != '''- [#2] Another 2
   test/pr/2
 
   Stable only!
 
-'''
+''':
+        raise AssertionError
     result = CliRunner().invoke(pr, ['list', '--target', 'does-not-exist'])
-    assert result.exit_code == 0
-    assert result.output == ''
+    if result.exit_code != 0:
+        raise AssertionError
+    if result.output != '':
+        raise AssertionError
 
 
 def test_cli_list_long_title(pr_tool_type, cd_to_pr_tool_repo):
@@ -144,23 +159,27 @@ def test_cli_list_long_title(pr_tool_type, cd_to_pr_tool_repo):
 
     result = CliRunner().invoke(pr, ['list'])
 
-    assert result.exit_code == 0
-    assert result.output == '''- [#1] My test My test My test My test My test My test My test My test My test
+    if result.exit_code != 0:
+        raise AssertionError
+    if result.output != '''- [#1] My test My test My test My test My test My test My test My test My test
   My test My test My test My test My test My test My test My test My test My
   test My test
   test/pr/1
 
   This tests important things
 
-'''
+''':
+        raise AssertionError
 
 
 def test_cli_tool_no_git(tmp_path):
     prev = os.getcwd()
     os.chdir(str(tmp_path))
     result = CliRunner().invoke(pr, ['list'])
-    assert result.exit_code == 1
-    assert 'not a git repository' in result.output
+    if result.exit_code != 1:
+        raise AssertionError
+    if 'not a git repository' not in result.output:
+        raise AssertionError
     os.chdir(prev)
 
 
@@ -169,8 +188,10 @@ def test_cli_tool_no_pr_config(tmp_path):
     os.chdir(str(tmp_path))
     git('init')
     result = CliRunner().invoke(pr, ['list'])
-    assert result.exit_code == 1
-    assert 'missing `git apple-llvm pr` configuration file' in result.output
+    if result.exit_code != 1:
+        raise AssertionError
+    if 'missing `git apple-llvm pr` configuration file' not in result.output:
+        raise AssertionError
     os.chdir(prev)
 
 
@@ -180,10 +201,14 @@ def test_cli_tool_test_swift_ci(pr_tool_type, cd_to_pr_tool_repo):
     git_apple_llvm.pr.main.pr_tool = create_pr_tool(mock_tool, pr_tool_type)
 
     result = CliRunner().invoke(pr, ['test', '#1'])
-    assert result.exit_code == 0
-    assert 'Triggering pull request testing for pr #1 by <author>:' in result.output
-    assert 'My test' in result.output
-    assert 'you commented "@swift-ci please test" on the pull request' in result.output
+    if result.exit_code != 0:
+        raise AssertionError
+    if 'Triggering pull request testing for pr #1 by <author>:' not in result.output:
+        raise AssertionError
+    if 'My test' not in result.output:
+        raise AssertionError
+    if 'you commented "@swift-ci please test" on the pull request' not in result.output:
+        raise AssertionError
 
 
 JENKINS_TEST_API_URL = 'https://test.foo/bar'
@@ -272,10 +297,14 @@ def test_cli_tool_test_jenkins_swift_plans(cd_to_pr_tool_repo_clone_adjust_jenki
     httpretty.register_uri(httpretty.POST, url1,
                            body=request_callback)
     result = CliRunner().invoke(pr, ['test', '#1', '--test', 'pr'])
-    assert result.exit_code == 0
-    assert 'Triggering pull request testing for pr #1 by <author>:' in result.output
-    assert 'My test' in result.output
-    assert '✅ requested pr [a-RA] ci job for PR #1' in result.output
+    if result.exit_code != 0:
+        raise AssertionError
+    if 'Triggering pull request testing for pr #1 by <author>:' not in result.output:
+        raise AssertionError
+    if 'My test' not in result.output:
+        raise AssertionError
+    if '✅ requested pr [a-RA] ci job for PR #1' not in result.output:
+        raise AssertionError
 
 
 def test_cli_tool_test_invalid_pr(cd_to_pr_tool_repo):
@@ -283,8 +312,10 @@ def test_cli_tool_test_invalid_pr(cd_to_pr_tool_repo):
     git_apple_llvm.pr.main.pr_tool = create_pr_tool(mock_tool, 'mock')
 
     result = CliRunner().invoke(pr, ['test', '#1'])
-    assert result.exit_code == 1
-    assert 'pull request #1 does not exist' in result.output
+    if result.exit_code != 1:
+        raise AssertionError
+    if 'pull request #1 does not exist' not in result.output:
+        raise AssertionError
 
 
 def test_cli_tool_test_closed_pr(pr_tool_type):
@@ -294,7 +325,8 @@ def test_cli_tool_test_closed_pr(pr_tool_type):
     git_apple_llvm.pr.main.pr_tool = create_pr_tool(mock_tool, pr_tool_type)
 
     result = CliRunner().invoke(pr, ['test', '#1'])
-    assert result.exit_code == 1
+    if result.exit_code != 1:
+        raise AssertionError
     # XFAIL: assert 'pull request #1 (My test) is no longer open' in result.output
 
 
@@ -312,19 +344,25 @@ def test_cli_tool_create_pr(cd_to_pr_tool_repo_clone, pr_tool_type):
 
     # PR creation fails when the branch is not pushed.
     result = CliRunner().invoke(pr, ['create', '-m', 'test pr', '-b', 'master', '-h', 'pr_branch'])
-    assert result.exit_code == 1
-    assert 'head branch "pr_branch" is not a valid remote tracking branch' in result.output
+    if result.exit_code != 1:
+        raise AssertionError
+    if 'head branch "pr_branch" is not a valid remote tracking branch' not in result.output:
+        raise AssertionError
 
     # PR should be create when the branch is there.
     git('push', 'origin', '-u', '-f', 'pr_branch')
     result = CliRunner().invoke(pr, ['create', '-m', 'test pr', '--base', 'master', '--head', 'pr_branch'])
-    assert result.exit_code == 0
-    assert 'Creating pull request:' in result.output
-    assert '  pr_branch -> master on' in result.output
+    if result.exit_code != 0:
+        raise AssertionError
+    if 'Creating pull request:' not in result.output:
+        raise AssertionError
+    if '  pr_branch -> master on' not in result.output:
+        raise AssertionError
     assert 'Created a pull request #1 (test/pr/1)'
 
     created_pr = git_apple_llvm.pr.main.pr_tool.get_pr_from_number(1)
-    assert created_pr.info.author_username == 'pr_branch'
+    if created_pr.info.author_username != 'pr_branch':
+        raise AssertionError
 
 
 def test_cli_tool_create_pr_invalid_base(cd_to_pr_tool_repo_clone, pr_tool_type):
@@ -337,5 +375,7 @@ def test_cli_tool_create_pr_invalid_base(cd_to_pr_tool_repo_clone, pr_tool_type)
     git_apple_llvm.pr.main.pr_tool = create_pr_tool(mock_tool, pr_tool_type)
     # PR creation fails when the branch is not pushed.
     result = CliRunner().invoke(pr, ['create', '-m', 'test pr', '-b', 'mastar', '-h', 'pr_branch2'])
-    assert result.exit_code == 1
-    assert 'base branch "mastar" is not a valid remote tracking branch' in result.output
+    if result.exit_code != 1:
+        raise AssertionError
+    if 'base branch "mastar" is not a valid remote tracking branch' not in result.output:
+        raise AssertionError

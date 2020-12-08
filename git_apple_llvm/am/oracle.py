@@ -56,7 +56,8 @@ def get_ci_status(commit_hash: str, target_branch: str) -> Optional[str]:
     id = f'{commit_hash}_{target_branch}'
     val = get_state(id)
     if val:
-        assert val in CommitStates.all
+        if val not in CommitStates.all:
+            raise AssertionError
         return val
     return None
 

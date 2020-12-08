@@ -59,5 +59,7 @@ def cd_to_am_tool_repo_clone(am_tool_git_repo_clone: str):
 def test_am_merge_conflict(cd_to_am_tool_repo_clone):
     result = CliRunner().invoke(am, ['status', '--target', 'master', '--no-fetch'])
 
-    assert result.exit_code == 0
-    assert 'Conflict' in result.output
+    if result.exit_code != 0:
+        raise AssertionError
+    if 'Conflict' not in result.output:
+        raise AssertionError

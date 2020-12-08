@@ -17,6 +17,9 @@ def config_dir(tmp_path):
 
 def test_config_file(config_dir):
     write_config('config', 'test')
-    assert os.path.isfile(os.path.join(config_dir, 'config'))
-    assert read_config('config') == 'test'
-    assert read_config('none') is None
+    if not os.path.isfile(os.path.join(config_dir, 'config')):
+        raise AssertionError
+    if read_config('config') != 'test':
+        raise AssertionError
+    if read_config('none') is not None:
+        raise AssertionError
