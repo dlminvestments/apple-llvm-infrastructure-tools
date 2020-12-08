@@ -55,10 +55,10 @@ def test_update_checker(tmp_path):
     clone_repo.index.add(['second_file'])
     clone_repo.index.commit('modified clone')
 
+
     # Update checking should not work with another branch
     reset_update_state()
     clone_repo.git.checkout('HEAD', b='my_branch')
     p = clone_dir / 'my_branch'
     p.write_text(u'my_branch')
     clone_repo.index.add(['my_branch'])
-    clone_repo.index.commit('my_branch')
