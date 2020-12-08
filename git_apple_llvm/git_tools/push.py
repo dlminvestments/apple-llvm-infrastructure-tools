@@ -133,7 +133,8 @@ class SplitRemote:
 
         # Setup the directory into which the split repo is actually
         # cloned.
-        assert os.path.isdir('.git')
+        if not os.path.isdir('.git'):
+            raise AssertionError
         self.remote_clone_dir = os.path.abspath(
             os.path.join('.git', f'apple-llvm-split-{split_dir}.git'))
         if not os.path.isdir(self.remote_clone_dir):
@@ -195,8 +196,10 @@ class CommitGraph:
         """
 
     def __init__(self, commits: List[str], roots: List[str]):
-        assert len(commits) > 0
-        assert len(roots) > 0
+        if len(commits) <= 0:
+            raise AssertionError
+        if len(roots) <= 0:
+            raise AssertionError
         self.commits = commits
         self.roots = roots
 
@@ -294,7 +297,8 @@ def regraft_commit_graph_onto_split_repo(commit_graph: CommitGraph,
         Raises `RegraftMissingSplitRootError` or `RegraftMissingSplitRootError`
         when the commit graph roots can't be remapped.
     """
-    assert split_dir == '-' or split_dir in all_monorepo_split_dirs
+    if not (split_dir == '-' or split_dir in all_monorepo_split_dirs):
+        raise AssertionError
     base_split_commits = {}
     for root in commit_graph.roots:
         base_split_commit = find_base_split_commit(split_dir, root)
@@ -351,7 +355,8 @@ def regraft_commit_graph_onto_split_repo(commit_graph: CommitGraph,
     original_changed_files = commit_graph.compute_changed_files(
         split_dir=split_dir)
     regrafted_changed_files = result.compute_changed_files()
-    assert original_changed_files == regrafted_changed_files
+    if original_changed_files != regrafted_changed_files:
+        raise AssertionError
     return result
 
 
@@ -422,7 +427,8 @@ def merge_commit_graph_with_top_of_branch(commit_graph: CommitGraph,
                                                               stdout='',
                                                               stderr='unable to rebase history with merges'))
             else:
-                assert strategy == MergeStrategy.RebaseOrMerge or strategy == MergeStrategy.MergeOnly
+                if not (strategy == MergeStrategy.RebaseOrMerge or strategy == MergeStrategy.MergeOnly):
+                    raise AssertionError
                 # Fallback to merge.
                 try:
                     git('merge', commit_graph.source_commit_hash,

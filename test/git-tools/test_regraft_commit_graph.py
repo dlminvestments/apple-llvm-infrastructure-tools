@@ -25,22 +25,34 @@ def test_regraft_commit_graph(cd_to_monorepo):
 
     # Verify that the expected split commit graphs have been produced.
     clang_commit_graph = regraft_commit_graph_onto_split_repo(commit_graph, 'clang')
-    assert 1 == len(clang_commit_graph.roots)
-    assert git_output('rev-parse', 'split/clang/internal/master') == clang_commit_graph.roots[0]
-    assert 1 == len(clang_commit_graph.commits)
-    assert 'new-file' == git_output('show', clang_commit_graph.commits[0], '--name-only', '--format=')
+    if 1 != len(clang_commit_graph.roots):
+        raise AssertionError
+    if git_output('rev-parse', 'split/clang/internal/master') != clang_commit_graph.roots[0]:
+        raise AssertionError
+    if 1 != len(clang_commit_graph.commits):
+        raise AssertionError
+    if 'new-file' != git_output('show', clang_commit_graph.commits[0], '--name-only', '--format='):
+        raise AssertionError
 
     llvm_commit_graph = regraft_commit_graph_onto_split_repo(commit_graph, 'llvm')
-    assert 1 == len(llvm_commit_graph.roots)
-    assert git_output('rev-parse', 'split/llvm/internal/master') == llvm_commit_graph.roots[0]
-    assert 1 == len(llvm_commit_graph.commits)
-    assert 'file1' == git_output('show', llvm_commit_graph.commits[0], '--name-only', '--format=')
+    if 1 != len(llvm_commit_graph.roots):
+        raise AssertionError
+    if git_output('rev-parse', 'split/llvm/internal/master') != llvm_commit_graph.roots[0]:
+        raise AssertionError
+    if 1 != len(llvm_commit_graph.commits):
+        raise AssertionError
+    if 'file1' != git_output('show', llvm_commit_graph.commits[0], '--name-only', '--format='):
+        raise AssertionError
 
     root_commit_graph = regraft_commit_graph_onto_split_repo(commit_graph, '-')
-    assert 1 == len(root_commit_graph.roots)
-    assert git_output('rev-parse', 'split/-/internal/master') == root_commit_graph.roots[0]
-    assert 1 == len(root_commit_graph.commits)
-    assert 'new-dir/root-file' == git_output('show', root_commit_graph.commits[0], '--name-only', '--format=')
+    if 1 != len(root_commit_graph.roots):
+        raise AssertionError
+    if git_output('rev-parse', 'split/-/internal/master') != root_commit_graph.roots[0]:
+        raise AssertionError
+    if 1 != len(root_commit_graph.commits):
+        raise AssertionError
+    if 'new-dir/root-file' != git_output('show', root_commit_graph.commits[0], '--name-only', '--format='):
+        raise AssertionError
 
     # "Regenerate" the clang change from the test scenario with appropriate
     # monorepo metadata.
@@ -71,21 +83,29 @@ def test_regraft_commit_graph(cd_to_monorepo):
                                first_clang_change], [internal_head,
                                                      regenerated_clang_change_hash])
     merged_clang_commit_graph = regraft_commit_graph_onto_split_repo(merge_graph, 'clang')
-    assert 2 == len(merged_clang_commit_graph.roots)
-    assert clang_commit_graph.roots[0] == merged_clang_commit_graph.roots[1]
-    assert clang_commit_graph.commits[0] == merged_clang_commit_graph.roots[0]
-    assert 3 == len(merged_clang_commit_graph.commits)
-    assert 'dir/subchange' == git_output('show', merged_clang_commit_graph.commits[0],
-                                         '--name-only', '--format=')
-    assert 'dir/subchange' == git_output('show', merged_clang_commit_graph.commits[2],
-                                         '--name-only', '--format=')
+    if 2 != len(merged_clang_commit_graph.roots):
+        raise AssertionError
+    if clang_commit_graph.roots[0] != merged_clang_commit_graph.roots[1]:
+        raise AssertionError
+    if clang_commit_graph.commits[0] != merged_clang_commit_graph.roots[0]:
+        raise AssertionError
+    if 3 != len(merged_clang_commit_graph.commits):
+        raise AssertionError
+    if 'dir/subchange' != git_output('show', merged_clang_commit_graph.commits[0],
+                                         '--name-only', '--format='):
+        raise AssertionError
+    if 'dir/subchange' != git_output('show', merged_clang_commit_graph.commits[2],
+                                         '--name-only', '--format='):
+        raise AssertionError
 
     # Try to regraft something unmodified in the commit graph.
     clang_only_commit_graph = CommitGraph([clang_change_hash], [internal_head])
     no_llvm_commit_graph = regraft_commit_graph_onto_split_repo(clang_only_commit_graph, 'llvm')
-    assert None == no_llvm_commit_graph
+    if None != no_llvm_commit_graph:
+        raise AssertionError
     no_root_commit_graph = regraft_commit_graph_onto_split_repo(clang_only_commit_graph, '-')
-    assert None == no_root_commit_graph
+    if None != no_root_commit_graph:
+        raise AssertionError
 
 
 def test_regraft_no_split_root(cd_to_monorepo):
@@ -95,7 +115,8 @@ def test_regraft_no_split_root(cd_to_monorepo):
     # Try to regraft something that has no `apple-llvm-split-*` history.
     with pytest.raises(RegraftNoSplitRootError) as err:
         regraft_commit_graph_onto_split_repo(CommitGraph([clang_change_hash], [internal_head]), 'polly')
-    assert err.value.root_commit_hash == internal_head
+    if err.value.root_commit_hash != internal_head:
+        raise AssertionError
 
 
 def test_regraft_missing_split_root(cd_to_monorepo):
@@ -106,4 +127,5 @@ def test_regraft_missing_split_root(cd_to_monorepo):
     bad_clang_hash = commit_file('clang/another-file', 'internal: new file')
     with pytest.raises(RegraftMissingSplitRootError) as err:
         regraft_commit_graph_onto_split_repo(CommitGraph([bad_clang_hash], [bad_master_head]), 'clang')
-    assert err.value.root_commit_hash == bad_master_head
+    if err.value.root_commit_hash != bad_master_head:
+        raise AssertionError

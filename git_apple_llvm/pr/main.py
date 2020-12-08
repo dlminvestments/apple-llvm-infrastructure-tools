@@ -67,7 +67,8 @@ class PRToolConfiguration:
         raise ValueError('invalid tool type')
 
     def create_github_tool(self) -> PRTool:
-        assert self.type == PRToolType.GitHub
+        if self.type != PRToolType.GitHub:
+            raise AssertionError
         return create_github_pr_tool(self.domain, self.user, self.repo)
 
 
@@ -181,12 +182,14 @@ class PullRequestParamType(click.ParamType):
 
 
 def make_pr_number_ref(pr: PullRequestRef) -> PullRequestNumber:
-    assert isinstance(pr, PullRequestNumber)
+    if not isinstance(pr, PullRequestNumber):
+        raise AssertionError
     return pr
 
 
 def max_length(text: str, max_len: int) -> str:
-    assert max_len > 3
+    if max_len <= 3:
+        raise AssertionError
     if len(text) <= max_len:
         return text
     return text[:max_len - 3] + '...'
@@ -208,7 +211,8 @@ def test(pr_ref: PullRequestRef, test: str):
     pr: Optional[PullRequest] = pr_tool.get_pr_from_number(pr_number)
     if not pr:
         fatal(f'pull request #{pr_number} does not exist')
-    assert pr  # Type checking appeasement.
+    if not pr:
+        raise AssertionError
     if pr.info.state != PullRequestState.Open:
         fatal(
             f'pull request #{pr_number} ({shorten(pr.info.title)}) is no longer open')

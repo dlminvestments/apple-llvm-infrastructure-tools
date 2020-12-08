@@ -40,7 +40,8 @@ class BranchIterator:
         self.commits: List[str] = commits
         self.merge_base_generator = merge_base_generator
         self.cached_merge_bases: List[Optional[str]] = list([None for x in commits])
-        assert len(self.commits) == len(self.cached_merge_bases)
+        if len(self.commits) != len(self.cached_merge_bases):
+            raise AssertionError
         self.i: int = 0
         self.len: int = len(self.commits)
         self.initial_merge_base: str = initial_merge_base
@@ -112,7 +113,8 @@ def compute_zippered_merge_commits(left: BranchIterator, right: BranchIterator,
 
         if find_next_matching_merge_base(left, right):
             # If both merge bases match, construct a merge from both branches in one commit.
-            assert left.current_merge_base == right.current_merge_base
+            if left.current_merge_base != right.current_merge_base:
+                raise AssertionError
             merges.append([left.takeCommit(), right.takeCommit()])
             continue
         break
