@@ -12,7 +12,8 @@ def test_git_invocation(tmp_path):
     """ Tests for the git/git_output functions. """
     repo_path = tmp_path / 'repo'
     repo_path.mkdir()
-    assert repo_path.is_dir()  # Ensure the dir is there for us to work with.
+    if not repo_path.is_dir():
+        raise AssertionError
     repo_dir = str(repo_path)
 
     git('init', git_dir=repo_dir)
@@ -23,27 +24,36 @@ def test_git_invocation(tmp_path):
     # Check that we can report an error on failure.
     with pytest.raises(GitError) as err:
         git('add', 'foo', git_dir=repo_dir)
-    assert err.value.stderr.startswith('fatal')
-    assert repr(err.value).startswith('GitError')
+    if not err.value.stderr.startswith('fatal'):
+        raise AssertionError
+    if not repr(err.value).startswith('GitError'):
+        raise AssertionError
 
     # Check that errors can be ignored.
     git('add', 'foo', git_dir=repo_dir, ignore_error=True)
 
     output = git_output('commit', '-m', 'initial', git_dir=repo_dir)
-    assert len(output) > 0
+    if len(output) <= 0:
+        raise AssertionError
 
     # Ensure that the output is stripped.
     output = git_output('rev-list', 'HEAD', git_dir=repo_dir)
-    assert '\n' not in output
+    if '\n' in output:
+        raise AssertionError
     output = git_output('rev-list', 'HEAD', git_dir=repo_dir, strip=False)
-    assert '\n' in output
+    if '\n' not in output:
+        raise AssertionError
 
     # Ensure that commit exists works only for commit hashes.
     hash = output.strip()
-    assert commit_exists(hash)
-    assert not commit_exists('HEAD')
-    assert not commit_exists(hash + 'abc')
-    assert not commit_exists('000000')
+    if not commit_exists(hash):
+        raise AssertionError
+    if commit_exists('HEAD'):
+        raise AssertionError
+    if commit_exists(hash + 'abc'):
+        raise AssertionError
+    if commit_exists('000000'):
+        raise AssertionError
 
     # Ensure that we can get the directory of the checkout even when the
     # working directory is a subdirectory.
@@ -54,9 +64,14 @@ def test_git_invocation(tmp_path):
     os.chdir(os.path.join(repo_dir, 'subdir'))
     dir_b = get_current_checkout_directory()
     os.chdir(cwd)
-    assert dir_a == dir_b
+    if dir_a != dir_b:
+        raise AssertionError
 
-    assert read_file_or_none('HEAD', 'initial') == 'initial'
-    assert read_file_or_none(hash, 'initial') == 'initial'
-    assert read_file_or_none('HEAD', 'path/does-not-exist') is None
-    assert read_file_or_none('foo', 'initial') is None
+    if read_file_or_none('HEAD', 'initial') != 'initial':
+        raise AssertionError
+    if read_file_or_none(hash, 'initial') != 'initial':
+        raise AssertionError
+    if read_file_or_none('HEAD', 'path/does-not-exist') is not None:
+        raise AssertionError
+    if read_file_or_none('foo', 'initial') is not None:
+        raise AssertionError

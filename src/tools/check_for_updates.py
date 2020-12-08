@@ -85,7 +85,8 @@ def update_repository() -> bool:
     try:
         repo = InfrastructureToolsGitRepo()
         remote_name = repo.get_remote_name_if_master_checkout()
-        assert remote_name.find('/') == -1
+        if remote_name.find('/') != -1:
+            raise AssertionError
         # The update marker will store the last update date
         store_dir = os.path.join(
             repo.git_path, 'update-checking-marker', remote_name)
