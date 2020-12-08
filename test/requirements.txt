@@ -1,3 +1,0 @@
-pytest-mock==3.3.1
-pytest-xdist
- main
