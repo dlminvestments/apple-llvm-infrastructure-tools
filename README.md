@@ -25,3 +25,5 @@ sudo make uninstall
 ## More documentation
 
 `cd docs/ && make html && open _build/html/index.html` for more documentation.
+
+<a href="https://codebeat.co/projects/github-com-dlminvestments-apple-llvm-infrastructure-tools-main"><img alt="codebeat badge" src="https://codebeat.co/badges/2be39a97-593e-4c38-80a4-ab9416cff7f4" /></a>
